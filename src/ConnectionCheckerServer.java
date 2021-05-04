@@ -1,9 +1,4 @@
-import com.sun.org.apache.xpath.internal.operations.Mult;
-
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -29,6 +24,7 @@ public class ConnectionCheckerServer {
         while (true) {
             try {
                 Socket client = serverSocket.accept();
+                System.out.println(client.getRemoteSocketAddress());
                 this.multiClientHandler = new MultiClientHandler(client);
                 this.multiClientHandler.run();
             } catch (IOException e) {
@@ -46,15 +42,39 @@ public class ConnectionCheckerServer {
 
         @Override
         public void run() {
+            ObjectOutputStream oos = null;
+            ObjectInputStream ois = null;
             try {
-                ObjectOutputStream oos = new ObjectOutputStream(this.socket.getOutputStream());
-                ObjectInputStream ois = new ObjectInputStream(this.socket.getInputStream());
-                oos.writeObject("Connection accepted.");
+                oos = new ObjectOutputStream(this.socket.getOutputStream());
+                ois = new ObjectInputStream(this.socket.getInputStream());
+                oos.writeUTF("Connection accepted.");
                 oos.flush();
-                oos.close();
-                ois.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+
+            label:
+            while (!socket.isClosed() && socket.isConnected()) {
+                try {
+                    assert ois != null;
+                    String clientMessage = ois.readUTF();
+                    switch (clientMessage) {
+                        case "pingTest":
+                            oos.writeUTF("message received");
+                            oos.flush();
+                            break;
+                        case "downloadTest":
+
+                            break;
+                        case "uploadTest":
+
+                            break;
+                        case "closeConnection":
+                            break label;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
