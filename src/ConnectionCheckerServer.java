@@ -75,7 +75,7 @@ public class ConnectionCheckerServer {
 
                             break;
                         case "uploadTest":
-                        os.writeUTF("upload message received");
+                        oos.writeUTF("upload message received");
                             oos.flush();
 
 
@@ -88,6 +88,9 @@ public class ConnectionCheckerServer {
                             }
                             try {
                                 byte[] fileContent = (byte[]) ois.readObject();
+                                long endTime = System.currentTimeMillis();
+                                oos.writeLong(endTime);
+                                oos.flush();
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             }
