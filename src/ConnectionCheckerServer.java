@@ -75,6 +75,22 @@ public class ConnectionCheckerServer {
 
                             break;
                         case "uploadTest":
+                        os.writeUTF("upload message received");
+                            oos.flush();
+
+
+                            File fileName = new File("uploadFile.txt");
+                            try {
+                                Files.deleteIfExists(fileName.toPath());
+                                System.out.println("File creation: " + fileName.createNewFile());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                byte[] fileContent = (byte[]) ois.readObject();
+                            } catch (ClassNotFoundException e) {
+                                e.printStackTrace();
+                            }
 
                             break;
                         case "closeConnection":
