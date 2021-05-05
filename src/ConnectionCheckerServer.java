@@ -85,6 +85,11 @@ public class ConnectionCheckerServer {
                     return;
                 }
             }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
