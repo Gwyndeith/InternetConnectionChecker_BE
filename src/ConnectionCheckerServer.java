@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.util.Arrays;
 
 /**
  * @author: Orkun Doğan
@@ -60,10 +62,16 @@ public class ConnectionCheckerServer {
                     String clientMessage = ois.readUTF();
                     switch (clientMessage) {
                         case "pingTest":
-                            oos.writeUTF("message received");
+                            oos.writeUTF("ping message received");
                             oos.flush();
                             break;
                         case "downloadTest":
+                            oos.writeUTF("download message received");
+                            oos.flush();
+                            File largeFile100MB = new File("/home/ec2-user/100MB.txt");
+                            byte[] fileContent = Files.readAllBytes(largeFile100MB.toPath());
+                            oos.writeObject(fileContent);
+                            oos.flush();
 
                             break;
                         case "uploadTest":
@@ -74,6 +82,7 @@ public class ConnectionCheckerServer {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return;
                 }
             }
         }
