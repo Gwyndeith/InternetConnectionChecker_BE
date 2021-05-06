@@ -46,6 +46,7 @@ public class ConnectionCheckerServer {
         public void run() {
             ObjectOutputStream oos = null;
             ObjectInputStream ois = null;
+            byte[] fileContent = null;
             try {
                 oos = new ObjectOutputStream(this.socket.getOutputStream());
                 ois = new ObjectInputStream(this.socket.getInputStream());
@@ -61,40 +62,25 @@ public class ConnectionCheckerServer {
                     assert ois != null;
                     String clientMessage = ois.readUTF();
                     switch (clientMessage) {
-                        case "pingTest":
-                            oos.writeUTF("ping message received");
-                            oos.flush();
-                            break;
                         case "downloadTest":
-                            oos.writeUTF("download message received");
+                            oos.writeUTF("Download message received.");
                             oos.flush();
                             File largeFile100MB = new File("/home/ec2-user/100MB.txt");
-                            byte[] fileContent = Files.readAllBytes(largeFile100MB.toPath());
+                            fileContent = Files.readAllBytes(largeFile100MB.toPath());
                             oos.writeObject(fileContent);
                             oos.flush();
-
                             break;
                         case "uploadTest":
-                        oos.writeUTF("upload message received");
+                            oos.writeUTF("Upload message received.");
                             oos.flush();
-
-
-                            File fileName = new File("uploadFile.txt");
                             try {
-                                Files.deleteIfExists(fileName.toPath());
-                                System.out.println("File creation: " + fileName.createNewFile());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                byte[] fileContent = (byte[]) ois.readObject();
+                                fileContent = (byte[]) ois.readObject();
                                 long endTime = System.currentTimeMillis();
                                 oos.writeLong(endTime);
                                 oos.flush();
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             }
-
                             break;
                         case "closeConnection":
                             break label;
