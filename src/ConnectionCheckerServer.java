@@ -25,6 +25,7 @@ public class ConnectionCheckerServer {
     public void run() {
         while (true) {
             try {
+                System.out.println("Waiting for connection...");
                 Socket client = serverSocket.accept();
                 System.out.println(client.getRemoteSocketAddress());
                 this.multiClientHandler = new MultiClientHandler(client);
@@ -48,15 +49,14 @@ public class ConnectionCheckerServer {
             ObjectInputStream ois = null;
             byte[] fileContent = null;
             try {
-                oos = new ObjectOutputStream(this.socket.getOutputStream());
-                ois = new ObjectInputStream(this.socket.getInputStream());
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                ois = new ObjectInputStream(socket.getInputStream());
                 oos.writeUTF("Connection accepted.");
                 oos.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            label:
             while (!socket.isClosed() && socket.isConnected()) {
                 try {
                     assert ois != null;
@@ -83,7 +83,8 @@ public class ConnectionCheckerServer {
                             }
                             break;
                         case "closeConnection":
-                            break label;
+                            socket.close();
+                            return;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
